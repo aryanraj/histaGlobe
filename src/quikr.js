@@ -38,17 +38,18 @@ function getHeaders(index) {
 	}
 }
 
-var quikr = function (_apiname, options, cb) {
+var quikr = function (_apiname, options, cb, err_cb) {
 	var opt = {
 		url : rootURL+apiname[_apiname],
 		qs : options,
 		headers : getHeaders(_apiname),
 		json : true
 	};
-	console.log(opt);
+	// console.log(opt);
 	request.get(opt, function (error, response, body) {
 		if(error) {
-			console.log(error);
+			err_cb = err_cb || function(){};
+			err_cb(error);
 		} else {
 			cb(body);
 		}
