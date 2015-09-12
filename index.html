@@ -1,0 +1,30 @@
+<div id="cesiumContainer"></div>
+<style>
+      @import url(js/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+  </style>
+<script type="text/javascript" src="js/Cesium.js"></script>
+<script type="text/javascript">
+	var viewer = new Cesium.Viewer('cesiumContainer');
+	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
+	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource){
+		viewer.dataSources.add(dataSource);
+		// console.log(dataSource.entities.values[0]);
+		
+		var entities = dataSource.entities.values;
+		var colorHash = {};
+
+		for (var i = 0; i < entities.length; i++) {
+			var entity = entities[i];
+            var color = Cesium.Color.fromRandom({
+                alpha : 1
+            });
+            colorHash[name] = color;
+            entity.polygon.material = color;
+            entity.polygon.outline = false;
+            entity.polygon.extrudedHeight = 1000000*Math.random();
+        }
+	})
+</script>
