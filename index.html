@@ -13,17 +13,19 @@
 	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
 	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource){
 		viewer.dataSources.add(dataSource);
-		// console.log(dataSource.entities.values[0]);
+		// console.log(dataSource.entities.values[0].proper);
 		
 		var entities = dataSource.entities.values;
 		var colorHash = {};
 
 		for (var i = 0; i < entities.length; i++) {
 			var entity = entities[i];
-            var color = Cesium.Color.fromRandom({
-                alpha : 1
-            });
-            colorHash[name] = color;
+			name = entity.properties.ST_NM;
+			if(!(name in colorHash))
+	            colorHash[name] = Cesium.Color.fromRandom({
+	                alpha : 1
+	            });
+            color = colorHash[name];
             entity.polygon.material = color;
             entity.polygon.outline = false;
             entity.polygon.extrudedHeight = 1000000*Math.random();
@@ -32,7 +34,7 @@
             	position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
             });
             viewer.camera.moveBackward(7000000);
-            
+
             // viewer.camera.lookAt(new Cesium.Cartesian3(3068883, 16174521, 2006723));
 
             // viewer.camera.lookAt(Cesium.Cartesian3.fromDegrees(78.0, 25.0), new Cesium.Cartesian3(0.0, 0.0, 7000000.0));
@@ -45,5 +47,6 @@
 			var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
 			// scene = viewer.scene;
         }
+        console.log(colorHash);
 	})
 </script>
