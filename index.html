@@ -7,7 +7,9 @@
   </style>
 <script type="text/javascript" src="js/Cesium.js"></script>
 <script type="text/javascript">
-	var viewer = new Cesium.Viewer('cesiumContainer');
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
+	});
 	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
 	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource){
 		viewer.dataSources.add(dataSource);
@@ -25,6 +27,23 @@
             entity.polygon.material = color;
             entity.polygon.outline = false;
             entity.polygon.extrudedHeight = 1000000*Math.random();
+
+            viewer.camera.setView({
+            	position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+            });
+            viewer.camera.moveBackward(7000000);
+            
+            // viewer.camera.lookAt(new Cesium.Cartesian3(3068883, 16174521, 2006723));
+
+            // viewer.camera.lookAt(Cesium.Cartesian3.fromDegrees(78.0, 25.0), new Cesium.Cartesian3(0.0, 0.0, 7000000.0));
+  			// viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+            var cylinder = new Cesium.CylinderGeometry({
+			    length: 200000,
+			    topRadius: 80000,
+			    bottomRadius: 200000,
+			});
+			var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
+			// scene = viewer.scene;
         }
 	})
 </script>
