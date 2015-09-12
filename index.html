@@ -7,6 +7,33 @@
   </style>
 <script type="text/javascript" src="js/Cesium.js"></script>
 <script type="text/javascript">
+	var cities = {};
+	cities[0]= {name :"Jammu and Kashmir", id : 1146897};
+	cities[1]= {name :"himachalpradesh", id : 1146896};
+	cities[2]= {name :"punjab", id : 1146910};
+	cities[3]= {name :"uttarakhand", id : 1146916};
+	cities[8]= {name :"haryana", id : 1146895};
+	cities[9]= {name :"chandigarh", id : 24};
+	cities[10]= {name :"uttarpradesh", id :1146915 };
+	cities[11]= {name :"rajasthan", id : 1146911};
+	cities[12]= {name :"arunachalpradesh", id : 1146886}; 
+	cities[13]= {name :"delhi", id : 27 };
+	cities[14]= {name :"sikkim", id :1146912 };
+	cities[15]= {name :"assam", id :1146887 };
+	cities[16]= {name :"bihar", id :1146888 };
+	cities[17]= {name :"westbengal", id :1146917 };
+	cities[18]= {name :"nagaland", id : 1146907 };
+	cities[20]= {name :"madhyapradesh", id :1146902 };
+	cities[21]= {name :"meghalaya", id :1146905 };
+	cities[22]= {name :"manipur", id :1146904 };
+	cities[23]= {name :"jharkhand", id :1146898 };
+	cities[25]= {name :"gujrat", id :1146894 };
+	//cities[0].id = 1146897;
+	console.log(cities[0].name);
+	console.log(cities[0].id);
+</script>
+
+<script type="text/javascript">
 	var viewer = new Cesium.Viewer('cesiumContainer', {
 		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
 	});
@@ -17,7 +44,7 @@
 		
 		var entities = dataSource.entities.values;
 		var colorHash = {};
-
+    console.log("it is "+entities.length);
 		for (var i = 0; i < entities.length; i++) {
 			var entity = entities[i];
 			name = entity.properties.ST_NM;
@@ -27,7 +54,7 @@
 	            });
             color = colorHash[name];
             entity.polygon.material = color;
-            entity.polygon.outline = false;
+            entity.polygon.outline = false; 
             entity.polygon.extrudedHeight = 1000000*Math.random();
 
             viewer.camera.setView({
