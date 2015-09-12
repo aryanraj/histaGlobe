@@ -44,32 +44,31 @@
 		
 		var entities = dataSource.entities.values;
 		var colorHash = {};
-    console.log("it is "+entities.length);
 		for (var i = 0; i < entities.length; i++) {
 			var entity = entities[i];
 			name = entity.properties.ST_NM;
 			if(!(name in colorHash))
-	            colorHash[name] = Cesium.Color.fromRandom({
-	                alpha : 1
-	            });
-            color = colorHash[name];
-            entity.polygon.material = color;
-            entity.polygon.outline = false; 
-            entity.polygon.extrudedHeight = 1000000*Math.random();
+				colorHash[name] = Cesium.Color.fromRandom({
+					alpha : 1
+			});
+			color = colorHash[name];
+			entity.polygon.material = color;
+			entity.polygon.outline = false; 
+			entity.polygon.extrudedHeight = 1000000*Math.random();
 
-            viewer.camera.setView({
-            	position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
-            });
-            viewer.camera.moveBackward(7000000);
+			viewer.camera.setView({
+				position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+			});
+			viewer.camera.moveBackward(7000000);
 
             // viewer.camera.lookAt(new Cesium.Cartesian3(3068883, 16174521, 2006723));
 
             // viewer.camera.lookAt(Cesium.Cartesian3.fromDegrees(78.0, 25.0), new Cesium.Cartesian3(0.0, 0.0, 7000000.0));
   			// viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-            var cylinder = new Cesium.CylinderGeometry({
-			    length: 200000,
-			    topRadius: 80000,
-			    bottomRadius: 200000,
+			var cylinder = new Cesium.CylinderGeometry({
+				length: 200000,
+				topRadius: 80000,
+				bottomRadius: 200000,
 			});
 			var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
 			// scene = viewer.scene;

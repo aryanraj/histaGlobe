@@ -3,17 +3,35 @@ var app = express();
 var config = require('./config/config');
 var quikr = require('./src/quikr');
 
-quikr(config, function (app) {
+app.use(express.static('public'));
+
+quikr(config, function (obj) {
 	
-	app("AdsByCategory",{
-		categoryId : 71,
-		city : "Delhi" 
+	obj("LiveOnQuikr",{}, function(data) {
+		console.log(data);
+	});
+	
+	obj("AdsByLocation", {
+		lat : 25.6000,
+		lon : 85.1000
 	}, function(data) {
 		console.log(data);
 	});
 
+	obj("AdsByCategory", {
+		categoryId : 71,
+		city : "Delhi"
+	}, function(data) {
+		console.log(data);
+	});
+
+	obj("Trending", {
+		city : 31
+	}, function(data) {
+		console.log(data);
+	});
+
+	app.listen(process.env.PORT || 8080);
+
 });
 
-app.use(express.static('public'));
-
-app.listen(process.env.PORT || 8080);
