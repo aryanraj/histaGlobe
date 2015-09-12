@@ -1,0 +1,25 @@
+{
+  "name": "quikr-hackathon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://_aryan_@bitbucket.org/_aryan_/quikrhackathon.git"
+  },
+  "keywords": [
+    "cesiumjs",
+    "quikr",
+    "hackathon"
+  ],
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/_aryan_/quikrhackathon#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
