@@ -1,13 +1,12 @@
 <div id="cesiumContainer" class="fullSize">
-	<div id="toolbar">
-	</div>
+	<div id="category"></div>
 </div>
 <style>
       @import url(js/Cesium/Widgets/widgets.css);
       html, body, #cesiumContainer {
           width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
       }
-      #toolbar {
+      #category {
 		margin: 5px;
 		padding: 2px 5px;
 		position: absolute;
@@ -29,7 +28,7 @@ $(document).ready(function() {
 		button.classList.add('cesium-button');
 		button.innerHTML = label;
 		button.onclick = handler;
-		document.getElementById('toolbar').appendChild(button);
+		document.getElementById('category').appendChild(button);
 	}
 
 	function reset() {
@@ -108,7 +107,7 @@ $(document).ready(function() {
 					}.bind({id:id}))
 				}
 			}
-		})
+		});
 
 	});
 });
