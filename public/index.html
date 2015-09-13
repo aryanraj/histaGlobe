@@ -282,11 +282,13 @@ $(document).ready(function() {
 	}
 
 	function setData(id) {
+		reset();
 		$.ajax({
 			type : 'GET',
 			url : '/category/'+id,
 			dataType : 'json',
 			success : function(data) {
+				renderSTATE();
 				for(var state in data) {
 					for(var part in states_entites[state]) {
 						states_entites[state][part].polygon.extrudedHeight = data[state]*10;
