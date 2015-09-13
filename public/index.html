@@ -11,6 +11,7 @@
 		padding: 2px 5px;
 		position: absolute;
 		z-index: 1;
+		max-width: 75%;
 	  }
   </style>
 <script type="text/javascript" src="js/Cesium/Cesium.js"></script>
@@ -18,7 +19,9 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	var viewer = new Cesium.Viewer('cesiumContainer', {
-		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
+		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW,
+		homeButton : false,
+		timeline : false
 	});
 	var states_entites = {};
 	var district_entities = {};
@@ -348,7 +351,8 @@ $(document).ready(function() {
 
 			entity.polygon.material = color;
 			entity.polygon.outline = false;
-			entity.polygon.extrudedHeight = data[name];
+			if(name in data)
+				entity.polygon.extrudedHeight = data[name]*10;
 			
 		}
 		viewer.camera.setView({
