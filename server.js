@@ -4,12 +4,13 @@ var app = express();
 var files_map = {
 	"category" : "./data/state_city_category_count.json",
 	"category_list" : "./data/category_list.json",
-	"cities_list" :  "./data/city.json"
+	"cities_list" :  "./data/city.json",
+	"city_district" : "./data/city_district_map.json"
 }
 
 app.use(express.static('public'));
 
-app.get('/category/:id', function(req, res){
+app.get('/category/state/:id', function(req, res){
 	var category_id = req.params.id;
 	var data = require(files_map["category"]);
 	var outData = {};
@@ -18,6 +19,25 @@ app.get('/category/:id', function(req, res){
 		for(city in data[state])
 			if(category_id in data[state][city])
 				outData[state] += data[state][city][category_id];
+	}
+	res.end(JSON.stringify(outData));
+});
+
+app.get('/category/district/:id', function(req, res){
+	var category_id = req.params.id;
+	var data = require(files_map["category"]);
+	var map = require(files_map["city_district"]);
+	var outData = {};
+	for(var dist in map) {
+		outData[dist] = 0;
+		for(var map_state in map[dist]) {
+			data_cities = data[map_state]
+			map_cities = map[dist][map_state];
+			for(var city in map_cities) {
+				if(map_cities[city] in data_cities)
+					outData[dist] += data_cities[map_cities[city]][category_id];
+			}
+		}
 	}
 	res.end(JSON.stringify(outData));
 });

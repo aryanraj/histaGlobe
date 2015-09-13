@@ -281,20 +281,26 @@ $(document).ready(function() {
 		viewer.dataSources.removeAll();
 	}
 
-	function setData(id) {
+	function setDataState(id) {
 		reset();
 		$.ajax({
 			type : 'GET',
-			url : '/category/'+id,
+			url : '/category/state/'+id,
 			dataType : 'json',
 			success : function(data) {
-				renderSTATE();
-				for(var state in data) {
-					for(var part in states_entites[state]) {
-						states_entites[state][part].polygon.extrudedHeight = data[state]*10;
-						states_entites[state][part].properties.value = data[state];
-					}
-				}
+				renderSTATE(data);
+			}
+		})
+	}
+
+	function setDataDistrict(id) {
+		reset();
+		$.ajax({
+			type : 'GET',
+			url : '/category/district/'+id,
+			dataType : 'json',
+			success : function(data) {
+				renderDISTRICT(data);
 			}
 		})
 	}
@@ -311,9 +317,9 @@ $(document).ready(function() {
 	// var STATE = Cesium.GeoJsonDataSource.load("data/STATE.json");
 	// var DISTRICT = Cesium.GeoJsonDataSource.load("data/DISTRICT.json");
 
-	var STATE, DISTRICT;
+	var STATE, DISTRICT, stateSelected = '';
 
-	function renderSTATE() {
+	function renderSTATE(data) {
 		reset();
 		var dataSource = STATE;
 		// viewer.dataSources.add(dataSource);
@@ -338,11 +344,11 @@ $(document).ready(function() {
 
 			color = colorHash[name];
 
-			entity.properties.value = 1000;
+			entity.properties.value = data[name];
 
 			entity.polygon.material = color;
 			entity.polygon.outline = false;
-			entity.polygon.extrudedHeight = 1000000;
+			entity.polygon.extrudedHeight = data[name];
 			
 		}
 		viewer.camera.setView({
@@ -351,7 +357,7 @@ $(document).ready(function() {
 		viewer.camera.moveBackward(7000000);
 	}
 
-	function renderDISTRICT(_state_name) {
+	function renderDISTRICT(data) {
 		reset();
 		var dataSource = DISTRICT;
 
@@ -362,7 +368,7 @@ $(document).ready(function() {
 			var entity = entities[i];
 			var state_name = entity.properties.ST_NM;
 
-			if(state_name == _state_name) {
+			if(state_name == stateSelected || stateSelected == '') {
 				var name = entity.properties.DISTRICT;
 				if(!(name in colorHash))
 					colorHash[name] = Cesium.Color.fromRandom({
@@ -377,11 +383,12 @@ $(document).ready(function() {
 
 				color = colorHash[name];
 
-				entity.properties.value = 1000;
+				entity.properties.value = data[name];
 
 				entity.polygon.material = color;
 				entity.polygon.outline = false;
-				entity.polygon.extrudedHeight = 1000000;
+				if(name in data)
+					entity.polygon.extrudedHeight = data[name]*25;
 				
 			}
 			viewer.camera.setView({
@@ -401,11 +408,11 @@ $(document).ready(function() {
 			}
 		});
 	}*/
-	window.renderDISTRICT = renderDISTRICT;
+	window.setDataDistrict = setDataDistrict;
 	
 	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {
 		STATE = dataSource;
-		renderSTATE();
+		setDataState(71);
 	});
 
 	Cesium.GeoJsonDataSource.load("data/DISTRICT.json").then(function(dataSource) {
@@ -418,8 +425,11 @@ $(document).ready(function() {
 		dataType : 'json',
 		success : function(data) {
 			for(var id in data) {
-				addButton(data[id], function(event){
-					setData(this.id);
+				addButton("State Wise "+data[id], function(event){
+					setDataState(this.id);
+				}.bind({id:id}))
+				addButton("District Wise "+data[id], function(event){
+					setDataDistrict(this.id);
 				}.bind({id:id}))
 			}
 		}
