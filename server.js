@@ -1,37 +1,30 @@
 var express = require('express');
 var app = express();
-var config = require('./config/config');
-var quikr = require('./src/quikr');
+
+var files_map = {
+	"category" : "./data/state_city_category_count.json",
+	"category_list" : "./data/category_list.json"
+}
 
 app.use(express.static('public'));
 
-quikr(config, function (obj) {
-	
-	obj("LiveOnQuikr",{}, function(data) {
-		console.log(data);
-	});
-	
-	obj("AdsByLocation", {
-		lat : 25.6000,
-		lon : 85.1000
-	}, function(data) {
-		console.log(data);
-	});
-
-	obj("AdsByCategory", {
-		categoryId : 71,
-		city : "Delhi"
-	}, function(data) {
-		console.log(data);
-	});
-
-	obj("Trending", {
-		city : 31
-	}, function(data) {
-		console.log(data);
-	});
-
-	app.listen(process.env.PORT || 8080);
-
+app.get('/category/:id', function(req, res){
+	var category_id = req.params.id;
+	var data = require(files_map["category"]);
+	var outData = {};
+	for(state in data) {
+		outData[state] = 0;
+		for(city in data[state])
+			if(category_id in data[state][city])
+				outData[state] += data[state][city][category_id];
+	}
+	res.end(JSON.stringify(outData));
 });
+
+app.get('/list/category', function(req, res){
+	var data = require(files_map["category_list"]);
+	res.end(JSON.stringify(data));
+});
+
+app.listen(process.env.PORT || 8080);
 

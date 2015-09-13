@@ -1,84 +1,116 @@
-<div id="cesiumContainer"></div>
+<div id="cesiumContainer" class="fullSize">
+	<div id="toolbar">
+	</div>
+</div>
 <style>
       @import url(js/Cesium/Widgets/widgets.css);
       html, body, #cesiumContainer {
           width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
       }
+      #toolbar {
+		margin: 5px;
+		padding: 2px 5px;
+		position: absolute;
+		z-index: 1;
+	  }
   </style>
 <script type="text/javascript" src="js/Cesium/Cesium.js"></script>
 <script type="text/javascript" src="js/Jquery/jquery.min.js"></script>
 <script type="text/javascript">
-	var cities = {};
-	cities[0]= {name :"Jammu and Kashmir", id : 1146897};
-	cities[1]= {name :"himachalpradesh", id : 1146896};
-	cities[2]= {name :"punjab", id : 1146910};
-	cities[3]= {name :"uttarakhand", id : 1146916};
-	cities[8]= {name :"haryana", id : 1146895};
-	cities[9]= {name :"chandigarh", id : 24};
-	cities[10]= {name :"uttarpradesh", id :1146915 };
-	cities[11]= {name :"rajasthan", id : 1146911};
-	cities[12]= {name :"arunachalpradesh", id : 1146886}; 
-	cities[13]= {name :"delhi", id : 27 };
-	cities[14]= {name :"sikkim", id :1146912 };
-	cities[15]= {name :"assam", id :1146887 };
-	cities[16]= {name :"bihar", id :1146888 };
-	cities[17]= {name :"westbengal", id :1146917 };
-	cities[18]= {name :"nagaland", id : 1146907 };
-	cities[20]= {name :"madhyapradesh", id :1146902 };
-	cities[21]= {name :"meghalaya", id :1146905 };
-	cities[22]= {name :"manipur", id :1146904 };
-	cities[23]= {name :"jharkhand", id :1146898 };
-	cities[25]= {name :"gujrat", id :1146894 };
-	//cities[0].id = 1146897;
-	console.log(cities[0].name);
-	console.log(cities[0].id);
-</script>
-
-<script type="text/javascript">
+$(document).ready(function() {
 	var viewer = new Cesium.Viewer('cesiumContainer', {
 		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
 	});
+	var states_entites = {};
 	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
-	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource){
+
+	function addButton(label, handler) {
+		var button = document.createElement('button');
+		button.classList.add('cesium-button');
+		button.innerHTML = label;
+		button.onclick = handler;
+		document.getElementById('toolbar').appendChild(button);
+	}
+
+	function reset() {
+		viewer.dataSources.removeAll();
+		viewer.camera.setView({
+			position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+		});
+	}
+
+	function setData(id) {
+		$.ajax({
+			type : 'GET',
+			url : '/category/'+id,
+			dataType : 'json',
+			success : function(data) {
+				for(var state in data) {
+					for(var part in states_entites[state]) {
+						states_entites[state][part].polygon.extrudedHeight = data[state]*10;
+						states_entites[state][part].properties.value = data[state];
+					}
+				}
+			}
+		})
+	}
+
+	function addMouseHoverHandler() {
+		var scene = viewer.scene;
+		handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+		handler.setInputAction(function(movement){
+			var pickedObject = scene.pick(movement.endPosition);
+			entity = pickedObject.id;
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	}
+	
+	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {
 		viewer.dataSources.add(dataSource);
-		// console.log(dataSource.entities.values[0].proper);
-		
 		var entities = dataSource.entities.values;
 		var colorHash = {};
 		for (var i = 0; i < entities.length; i++) {
+			
 			var entity = entities[i];
 			name = entity.properties.ST_NM;
+			
 			if(!(name in colorHash))
 				colorHash[name] = Cesium.Color.fromRandom({
 					alpha : 1
 			});
-			color = colorHash[name];
-			entity.polygon.material = color;
-			entity.polygon.outline = false; 
-			entity.polygon.extrudedHeight = 1000000*Math.random();
+			
+			if(!(name in states_entites))
+				states_entites[name] = [];
 
+			states_entites[name].push(entity);
+			
+			color = colorHash[name];
+
+			entity.properties.value = 1000;
+
+			entity.polygon.material = color;
+			entity.polygon.outline = false;
+			entity.polygon.extrudedHeight = 1000000;
+			
 			viewer.camera.setView({
 				position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
 			});
 			viewer.camera.moveBackward(7000000);
+		}
 
-            // viewer.camera.lookAt(new Cesium.Cartesian3(3068883, 16174521, 2006723));
+		$.ajax({
+			type : 'GET',
+			url : '/list/category',
+			dataType : 'json',
+			success : function(data) {
+				for(var id in data) {
+					addButton(data[id], function(event){
+						setData(this.id);
+					}.bind({id:id}))
+				}
+			}
+		})
 
-            // viewer.camera.lookAt(Cesium.Cartesian3.fromDegrees(78.0, 25.0), new Cesium.Cartesian3(0.0, 0.0, 7000000.0));
-  			// viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
-			var cylinder = new Cesium.CylinderGeometry({
-				length: 200000,
-				topRadius: 80000,
-				bottomRadius: 200000,
-			});
-			var geometry = Cesium.CylinderGeometry.createGeometry(cylinder);
-			// scene = viewer.scene;
-        }
-        console.log(Object.keys(colorHash));
-	})
-
-	function manageData(request) {
-
-	}
+	});
+});
 
 </script>

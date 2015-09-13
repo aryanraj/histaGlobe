@@ -80,3 +80,32 @@ module.exports = function(config, cb) {
 	    }
 	});
 }
+
+// quikr(config, function (obj) {
+	
+	// obj("LiveOnQuikr",{}, function(data) {
+	// 	console.log(data);
+	// });
+	
+	// obj("AdsByLocation", {
+	// 	lat : 25.6000,
+	// 	lon : 85.1000
+	// }, function(data) {
+	// 	console.log(data);
+	// });
+
+	// obj("AdsByCategory", {
+	// 	categoryId : 71,
+	// 	city : "Delhi"
+	// }, function(data) {
+	// 	console.log(data);
+	// });
+
+	// obj("Trending", {
+	// 	city : 31
+	// }, function(data) {
+	// 	console.log(data);
+	// });
+
+
+// });
