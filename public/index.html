@@ -21,6 +21,7 @@ $(document).ready(function() {
 		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
 	});
 	var states_entites = {};
+	var district_entities = {};
 	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
 
 	function addButton(label, handler) {
@@ -32,10 +33,8 @@ $(document).ready(function() {
 	}
 
 	function reset() {
+		viewer.entities.removeAll();
 		viewer.dataSources.removeAll();
-		viewer.camera.setView({
-			position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
-		});
 	}
 
 	function setData(id) {
@@ -62,15 +61,22 @@ $(document).ready(function() {
 			entity = pickedObject.id;
 		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 	}
-	
-	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {
-		viewer.dataSources.add(dataSource);
+
+	// var STATE = Cesium.GeoJsonDataSource.load("data/STATE.json");
+	// var DISTRICT = Cesium.GeoJsonDataSource.load("data/DISTRICT.json");
+
+	var STATE, DISTRICT;
+
+	function renderSTATE() {
+		reset();
+		var dataSource = STATE;
+		// viewer.dataSources.add(dataSource);
 		var entities = dataSource.entities.values;
 		var colorHash = {};
 		for (var i = 0; i < entities.length; i++) {
 			
 			var entity = entities[i];
-			name = entity.properties.ST_NM;
+			var name = entity.properties.ST_NM;
 			
 			if(!(name in colorHash))
 				colorHash[name] = Cesium.Color.fromRandom({
@@ -82,6 +88,8 @@ $(document).ready(function() {
 
 			states_entites[name].push(entity);
 			
+			viewer.entities.add(entity);
+
 			color = colorHash[name];
 
 			entity.properties.value = 1000;
@@ -90,26 +98,77 @@ $(document).ready(function() {
 			entity.polygon.outline = false;
 			entity.polygon.extrudedHeight = 1000000;
 			
+		}
+		viewer.camera.setView({
+			position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+		});
+		viewer.camera.moveBackward(7000000);
+	}
+
+	function renderDISTRICT(_state_name) {
+		reset();
+		var dataSource = DISTRICT;
+
+		var entities = dataSource.entities.values;
+		var colorHash = {};
+		for (var i = 0; i < entities.length; i++) {
+			
+			var entity = entities[i];
+			var state_name = entity.properties.ST_NM;
+
+			if(state_name == _state_name) {
+				var name = entity.properties.DISTRICT;
+				if(!(name in colorHash))
+					colorHash[name] = Cesium.Color.fromRandom({
+						alpha : 1
+				});
+				if(!(name in states_entites))
+				states_entites[name] = [];
+
+				states_entites[name].push(entity);
+				
+				viewer.entities.add(entity);
+
+				color = colorHash[name];
+
+				entity.properties.value = 1000;
+
+				entity.polygon.material = color;
+				entity.polygon.outline = false;
+				entity.polygon.extrudedHeight = 1000000;
+				
+			}
 			viewer.camera.setView({
 				position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
 			});
 			viewer.camera.moveBackward(7000000);
 		}
+	}
 
-		$.ajax({
-			type : 'GET',
-			url : '/list/category',
-			dataType : 'json',
-			success : function(data) {
-				for(var id in data) {
-					addButton(data[id], function(event){
-						setData(this.id);
-					}.bind({id:id}))
-				}
-			}
-		});
-
+	window.renderDISTRICT = renderDISTRICT;
+	
+	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {
+		STATE = dataSource;
+		renderSTATE();
 	});
+
+	Cesium.GeoJsonDataSource.load("data/DISTRICT.json").then(function(dataSource) {
+		DISTRICT = dataSource;
+	});
+
+	$.ajax({
+		type : 'GET',
+		url : '/list/category',
+		dataType : 'json',
+		success : function(data) {
+			for(var id in data) {
+				addButton(data[id], function(event){
+					setData(this.id);
+				}.bind({id:id}))
+			}
+		}
+	});
+
 });
 
 </script>
