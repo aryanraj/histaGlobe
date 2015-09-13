@@ -32,6 +32,68 @@ $(document).ready(function() {
 		document.getElementById('category').appendChild(button);
 	}
 
+	window.addButton = addButton;
+	addButton ('ciryWise',function(){
+		reset();
+		console.log("hi in rendercity");
+		$.ajax({
+			type : 'GET',
+			url : '/cities',
+			dataType : 'json',
+			success : function(cities) {
+		//			console.log(data);
+				/*
+				var greenCylinder = viewer.entities.add({
+			    name : 'Green cylinder with black outline',
+			    position: Cesium.Cartesian3.fromDegrees(79.8477, 14.1473, 2000.0),
+			    cylinder : {
+			        length : 400000.0,
+			        topRadius : 10000.0,
+			        bottomRadius : 10000.0,
+			        material : Cesium.Color.GREEN.withAlpha(0.5),
+			        outline : true,
+			        outlineColor : Cesium.Color.DARK_GREEN
+			    }
+				});
+				*/		
+				
+				for(city in cities)
+				{
+					console.log("it is ");
+					console.log(parseInt(cities[city].lon));
+					console.log(parseInt(cities[city].lat));
+					var height = 25 * (1000 + cities[city].val1);
+					
+					/*if(height < 1000)
+						height *= 900;
+					else if (height <3000)
+						height *= 500;
+					else if (height < 5000)
+						height *= 300;
+					else
+						height*=20;
+					*/
+					var greenCircle = viewer.entities.add({
+				    position: Cesium.Cartesian3.fromDegrees(parseFloat(cities[city].lon), parseFloat(cities[city].lat)),
+				    name : cities[city].name + " \n Number : " + cities[city].val1,
+				    ellipse : {
+				        semiMinorAxis : 30000.0,
+				        semiMajorAxis : 30000.0,
+				        material : Cesium.Color.fromRandom({
+								alpha : 1
+						}),
+				    	extrudedHeight : height,
+				    	
+				    }
+					});
+					console.log(greenCircle);
+			//		break;
+			//		greenCircle.propertyNames.value = cities[city].val1;
+				}
+			}
+		});
+
+	});	
 	function reset() {
 		viewer.entities.removeAll();
 		viewer.dataSources.removeAll();
@@ -144,7 +206,17 @@ $(document).ready(function() {
 			viewer.camera.moveBackward(7000000);
 		}
 	}
-
+	/*function renderCity() {
+		console.log("hi in rendercity");
+		$.ajax({
+			type : 'GET',
+			url : '/cities',
+			dataType : 'json',
+			success : function(data) {
+				console.log(data);
+			}
+		});
+	}*/
 	window.renderDISTRICT = renderDISTRICT;
 	
 	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {

@@ -1,0 +1,115 @@
+<div id="cesiumContainer" class="fullSize">
+	<div id="category"></div>
+</div>
+<style>
+      @import url(js/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+      #category {
+		margin: 5px;
+		padding: 2px 5px;
+		position: absolute;
+		z-index: 1;
+	  }
+  </style>
+<script type="text/javascript" src="js/Cesium/Cesium.js"></script>
+<script type="text/javascript" src="js/Jquery/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	var viewer = new Cesium.Viewer('cesiumContainer', {
+		sceneMode : Cesium.SceneMode.COLUMBUS_VIEW
+	});
+	var states_entites = {};
+	// viewer.dataSources.add(Cesium.GeoJsonDataSource.load("data/STATE.json"));
+
+	function addButton(label, handler) {
+		var button = document.createElement('button');
+		button.classList.add('cesium-button');
+		button.innerHTML = label;
+		button.onclick = handler;
+		document.getElementById('category').appendChild(button);
+	}
+
+	function reset() {
+		viewer.dataSources.removeAll();
+		viewer.camera.setView({
+			position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+		});
+	}
+
+	function setData(id) {
+		$.ajax({
+			type : 'GET',
+			url : '/category/'+id,
+			dataType : 'json',
+			success : function(data) {
+				for(var state in data) {
+					for(var part in states_entites[state]) {
+						states_entites[state][part].polygon.extrudedHeight = data[state]*10;
+						states_entites[state][part].properties.value = data[state];
+					}
+				}
+			}
+		})
+	}
+
+	function addMouseHoverHandler() {
+		var scene = viewer.scene;
+		handler = new Cesium.ScreenSpaceEventHandler(scene.canvas);
+		handler.setInputAction(function(movement){
+			var pickedObject = scene.pick(movement.endPosition);
+			entity = pickedObject.id;
+		}, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
+	}
+	
+	Cesium.GeoJsonDataSource.load("data/STATE.json").then(function(dataSource) {
+		viewer.dataSources.add(dataSource);
+		var entities = dataSource.entities.values;
+		var colorHash = {};
+		for (var i = 0; i < entities.length; i++) {
+			
+			var entity = entities[i];
+			name = entity.properties.ST_NM;
+			
+			if(!(name in colorHash))
+				colorHash[name] = Cesium.Color.fromRandom({
+					alpha : 1
+			});
+			
+			if(!(name in states_entites))
+				states_entites[name] = [];
+
+			states_entites[name].push(entity);
+			
+			color = colorHash[name];
+
+			entity.properties.value = 1000;
+
+			entity.polygon.material = color;
+			entity.polygon.outline = false;
+			entity.polygon.extrudedHeight = 1000000;
+			
+			viewer.camera.setView({
+				position : Cesium.Cartesian3.fromDegrees(78.0, 25.0)
+			});
+			viewer.camera.moveBackward(7000000);
+		}
+
+		$.ajax({
+			type : 'GET',
+			url : '/list/category',
+			dataType : 'json',
+			success : function(data) {
+				for(var id in data) {
+					addButton(data[id], function(event){
+						setData(this.id);
+					}.bind({id:id}))
+				}
+			}
+		});
+
+	});
+});
+
+</script>
